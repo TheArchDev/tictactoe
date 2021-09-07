@@ -1,6 +1,7 @@
 NOUGHT = "O"
 CROSS = "X"
 
+
 class Player(object):
 	def __init__(self, name, mark):
 		self.name = name
@@ -8,6 +9,7 @@ class Player(object):
 
 	def __str__(self):
 		return self.name
+
 
 class Game(object):
 
@@ -39,7 +41,8 @@ class Game(object):
 	def __str__(self):
 		return "\n".join([" ".join(row) for row in self.board])
 
-	def visual_y_location(self, y_coordinate):
+	@staticmethod
+	def visual_y_location(y_coordinate):
 		return 2-y_coordinate
 
 	def valid_play(self, x_coordinate, y_coordinate):
