@@ -50,7 +50,6 @@ class Game(object):
 
     def play_turn(self, x_coordinate, y_coordinate):
         self.board[self.visual_y_location(y_coordinate)][x_coordinate] = self.current_player.mark
-        self.board
         if self.is_winning_turn():
             self.winner = True
         elif self.is_final_turn():
