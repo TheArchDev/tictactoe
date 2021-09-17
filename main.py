@@ -1,3 +1,5 @@
+import random
+
 NOUGHT = "O"
 CROSS = "X"
 
@@ -9,6 +11,15 @@ class Player(object):
 
     def __str__(self):
         return self.name
+
+
+
+class HumanPlayer(Player):
+    pass
+
+
+class AIPlayer(Player):
+    pass
 
 
 class Game(object):
@@ -68,6 +79,15 @@ class Game(object):
     def is_final_turn(self):
         return not any([self.SPACE in row for row in self.board])
 
+    def available_spaces(self):
+        # list of tuples (x, y)
+        slots = []
+        for x in range(3):
+            for y in range(3):
+                if self.board[self.visual_y_location(y)][x] == self.SPACE:
+                    slots.append((x,y))
+        return slots
+
 
 def valid_coordinate(value):
     valid = False
@@ -105,8 +125,8 @@ def prompt_for_coordinates():
 
 def main():
     print("Welcome to this game of Tic-Tac-Toe!")
-    player_one = Player(input("Name of player one: ").strip(), NOUGHT)
-    player_two = Player(input("Name of player two: ").strip(), CROSS)
+    player_one = HumanPlayer(input("Name of player one: ").strip(), NOUGHT)
+    player_two = AIPlayer("COMPUTER", CROSS)
 
     game = Game(player_one, player_two)
 
@@ -114,12 +134,20 @@ def main():
         print(f"\n{game.current_player} to play...")
         print(game)
 
-        x_coordinate, y_coordinate = prompt_for_coordinates()
-        while not game.valid_play(x_coordinate, y_coordinate):
-            print(f"({x_coordinate}, {y_coordinate}) spot already taken!")
-            x_coordinate, y_coordinate = prompt_for_coordinates()
+        # # human specific
+        # if type(game.current_player) == HumanPlayer:
+        #     x_coordinate, y_coordinate = prompt_for_coordinates()
+        #     while not game.valid_play(x_coordinate, y_coordinate):
+        #         print(f"({x_coordinate}, {y_coordinate}) spot already taken!")
+        #         x_coordinate, y_coordinate = prompt_for_coordinates()
+        # else:
+        #     # do some AI logic; random available slot
+        #     available_spaces = game.available_spaces()
+        #     x_coordinate, y_coordinate = random.choice(available_spaces)
 
         game.play_turn(x_coordinate, y_coordinate)
+        game.current_player.play_turn
+        print(game.available_spaces())
 
     print(game)
     if game.winner is True:
