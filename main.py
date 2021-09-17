@@ -1,3 +1,6 @@
+import random
+
+
 NOUGHT = "O"
 CROSS = "X"
 
@@ -9,6 +12,20 @@ class Player(object):
 
     def __str__(self):
         return self.name
+
+
+class HumanPlayer(Player):
+    def choose_move(self, game):
+        x_coordinate, y_coordinate = prompt_for_coordinates()
+        while not game.valid_play(x_coordinate, y_coordinate):
+            print(f"({x_coordinate}, {y_coordinate}) spot already taken!")
+            x_coordinate, y_coordinate = prompt_for_coordinates()
+        return x_coordinate, y_coordinate
+
+
+class ComputerPlayer(Player):
+    def choose_move(self, game):
+        return random.choice(game.available_spots())
 
 
 class Game(object):
@@ -48,7 +65,8 @@ class Game(object):
     def valid_play(self, x_coordinate, y_coordinate):
         return self.board[self.visual_y_location(y_coordinate)][x_coordinate] == self.SPACE
 
-    def play_turn(self, x_coordinate, y_coordinate):
+    def play_turn(self):
+        x_coordinate, y_coordinate = self.current_player.choose_move(self)
         self.board[self.visual_y_location(y_coordinate)][x_coordinate] = self.current_player.mark
         if self.is_winning_turn():
             self.winner = True
@@ -67,6 +85,14 @@ class Game(object):
 
     def is_final_turn(self):
         return not any([self.SPACE in row for row in self.board])
+
+    def available_spots(self):
+        open_spots = []
+        for x in range(3):
+            for y in range(3):
+                if self.board[self.visual_y_location(y)][x] == self.SPACE:
+                    open_spots.append((x, y))
+        return open_spots
 
 
 def valid_coordinate(value):
@@ -105,21 +131,16 @@ def prompt_for_coordinates():
 
 def main():
     print("Welcome to this game of Tic-Tac-Toe!")
-    player_one = Player(input("Name of player one: ").strip(), NOUGHT)
-    player_two = Player(input("Name of player two: ").strip(), CROSS)
+    player_one = HumanPlayer(input("Name of player one: ").strip(), NOUGHT)
+    player_two = ComputerPlayer("COMPUTER", CROSS)
 
     game = Game(player_one, player_two)
 
     while game.winner is None:
         print(f"\n{game.current_player} to play...")
         print(game)
-
-        x_coordinate, y_coordinate = prompt_for_coordinates()
-        while not game.valid_play(x_coordinate, y_coordinate):
-            print(f"({x_coordinate}, {y_coordinate}) spot already taken!")
-            x_coordinate, y_coordinate = prompt_for_coordinates()
-
-        game.play_turn(x_coordinate, y_coordinate)
+        game.play_turn()
+        print('OPEN SPOTS', game.available_spots())
 
     print(game)
     if game.winner is True:
